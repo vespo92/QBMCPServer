@@ -18,21 +18,21 @@ SERVER_INFO = {
     "tools": [
         {
             "name": "get_jobcodes",
-            "description": "Get all jobcodes from QuickBooks Time. Returns jobcode details including name, type, and status.",
+            "description": "Get jobcodes from QuickBooks Time with advanced filtering options. Returns jobcode details including name, type, and status.",
             "inputSchema": {
                 "type": "object",
                 "properties": {
                     "ids": {"type": "array", "items": {"type": "number"}, "description": "Filter by specific jobcode IDs"},
                     "parent_ids": {"type": "array", "items": {"type": "number"}, "description": "Filter by parent jobcode IDs"},
                     "name": {"type": "string", "description": "Filter by name (use * as wildcard)"},
-                    "type": {"type": "string", "enum": ["regular", "pto", "paid_break", "unpaid_break", "all"]},
-                    "active": {"type": "string", "enum": ["yes", "no", "both"]},
-                    "customfields": {"type": "boolean"},
-                    "modified_before": {"type": "string"},
-                    "modified_since": {"type": "string"},
-                    "supplemental_data": {"type": "string", "enum": ["yes", "no"]},
-                    "page": {"type": "number"},
-                    "limit": {"type": "number"}
+                    "type": {"type": "string", "enum": ["regular", "pto", "paid_break", "unpaid_break", "all"], "description": "Filter by jobcode type"},
+                    "active": {"type": "string", "enum": ["yes", "no", "both"], "description": "Filter by active status"},
+                    "customfields": {"type": "boolean", "description": "Include custom field data"},
+                    "modified_before": {"type": "string", "description": "Return items modified before this date"},
+                    "modified_since": {"type": "string", "description": "Return items modified after this date"},
+                    "supplemental_data": {"type": "string", "enum": ["yes", "no"], "description": "Include supplemental data"},
+                    "page": {"type": "number", "description": "Page number for pagination"},
+                    "limit": {"type": "number", "description": "Number of results per page (max 200)"}
                 }
             }
         },
@@ -45,21 +45,6 @@ SERVER_INFO = {
                     "id": {"type": "number", "description": "The ID of the jobcode to retrieve"}
                 },
                 "required": ["id"]
-            }
-        },
-        {
-            "name": "search_jobcodes",
-            "description": "Search jobcodes with advanced filtering options.",
-            "inputSchema": {
-                "type": "object",
-                "properties": {
-                    "name": {"type": "string", "description": "Search by name (use * as wildcard)"},
-                    "type": {"type": "string", "enum": ["regular", "pto", "paid_break", "unpaid_break", "all"]},
-                    "active": {"type": "string", "enum": ["yes", "no", "both"]},
-                    "modified_since": {"type": "string"},
-                    "page": {"type": "number"},
-                    "limit": {"type": "number"}
-                }
             }
         },
         {
@@ -378,7 +363,6 @@ class JSONRPCServer:
         method_map = {
             'get_jobcodes': self.api.get_jobcodes,
             'get_jobcode': self.api.get_jobcode,
-            'search_jobcodes': self.api.search_jobcodes,
             'get_jobcode_hierarchy': self.api.get_jobcode_hierarchy,
             'get_timesheets': self.api.get_timesheets,
             'get_timesheet': self.api.get_timesheet,

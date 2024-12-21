@@ -137,11 +137,6 @@ class JobcodeAPI(BaseAPI):
 
             return self.handle_axios_error(error, f'Fetching jobcode {jobcode_id}')
 
-    def search_jobcodes(self, params: Dict[str, Any]):
-        """Search for jobcodes by name or other criteria."""
-        params = self.add_pagination_params(params)
-        return self.make_request('jobcodes', params=params)
-
     def get_jobcode_hierarchy(self, params: Optional[Dict[str, Any]] = None) -> Dict[str, Any]:
         """Get the jobcode hierarchy structure."""
         try:
