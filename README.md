@@ -7,7 +7,9 @@ This is a combined MCP server that provides access to all QuickBooks Time API fu
 3. Timesheet Tools
 4. User Tools
 
-## Setup
+I would LOVE help improving this project! Just glad to be able to give something back finally!
+
+This entire project was developed and published using artificial intelligence (Claude), as I personally cannot write code. While every effort has been made to ensure quality and functionality, there may be imperfections or areas for improvement. I welcome any feedback, corrections, or suggestions from the community.
 
 1. Install dependencies:
 ```bash
@@ -47,4 +49,18 @@ NODE_ENV=development
 python main.py
 ```
 
+<<<<<<< HEAD
 The server will start and listen for JSON-RPC requests on stdin/stdout.
+=======
+## License
+
+MIT License - See LICENSE file for details
+
+## Contributing
+
+Contributions are welcome! Please feel free to submit a Pull Request. Given that this project was developed with AI assistance, community input is especially valuable for improving and maintaining the codebase.
+
+## Support
+
+For issues and feature requests, please use the GitHub issues page or contact me directly at github.com/aallsbury.
+>>>>>>> 9df3b707881664982c180132020be3ed1f374859
