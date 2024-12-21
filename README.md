@@ -4,6 +4,8 @@ A Message Control Protocol (MCP) server that provides unified access to QuickBoo
 
 ## Important Note
 
+I would LOVE help improving this project! Just glad to be able to give something back finally!
+
 This entire project was developed and published using artificial intelligence (Claude), as I personally cannot write code. While every effort has been made to ensure quality and functionality, there may be imperfections or areas for improvement. I welcome any feedback, corrections, or suggestions from the community.
 
 If you find any issues or have suggestions for improvements, please don't hesitate to open an issue or submit a pull request. Your expertise and input are greatly appreciated, as they will help make this project better for everyone.
