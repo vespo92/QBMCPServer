@@ -38,26 +38,46 @@ SERVER_INFO = {
         },
         {
             "name": "get_jobcode",
-            "description": "Get details for a specific jobcode by ID.",
+            "description": "Get detailed information about a specific jobcode including its properties, hierarchy position, billing settings, and optional custom fields.",
             "inputSchema": {
                 "type": "object",
                 "properties": {
-                    "id": {"type": "number", "description": "The ID of the jobcode to retrieve"}
+                    "id": {
+                        "type": "number",
+                        "description": "The unique identifier of the jobcode to retrieve"
+                    },
+                    "customfields": {
+                        "type": "boolean",
+                        "default": False,
+                        "description": "Include custom fields in response"
+                    }
                 },
                 "required": ["id"]
             }
         },
         {
             "name": "get_jobcode_hierarchy",
-            "description": "Get complete jobcode hierarchy starting from top-level jobcodes.",
+            "description": "Get the hierarchical structure of jobcodes in your company. Jobcodes can be organized in a parent-child relationship, creating a tree-like structure.",
             "inputSchema": {
                 "type": "object",
                 "properties": {
-                    "name": {"type": "string", "description": "Filter by name (use * as wildcard)"},
-                    "type": {"type": "string", "enum": ["regular", "pto", "paid_break", "unpaid_break", "all"]},
-                    "active": {"type": "string", "enum": ["yes", "no", "both"]},
-                    "customfields": {"type": "boolean"},
-                    "supplemental_data": {"type": "string", "enum": ["yes", "no"]}
+                    "parent_ids": {
+                        "type": "array",
+                        "items": {"type": "number"},
+                        "description": "Filter by parent IDs. Special values: 0 (top-level only), -1 (all levels). Default returns all levels."
+                    },
+                    "active": {
+                        "type": "string",
+                        "enum": ["yes", "no", "both"],
+                        "default": "yes",
+                        "description": "Filter by active status"
+                    },
+                    "type": {
+                        "type": "string",
+                        "enum": ["regular", "pto", "paid_break", "unpaid_break", "all"],
+                        "default": "regular",
+                        "description": "Filter by jobcode type"
+                    }
                 }
             }
         },
@@ -87,63 +107,223 @@ SERVER_INFO = {
         },
         {
             "name": "get_current_timesheets",
-            "description": "Get currently active timesheets.",
+            "description": "Get currently active timesheets (users who are 'on the clock') with filtering options.",
             "inputSchema": {
                 "type": "object",
-                "properties": {}
+                "properties": {
+                    "user_ids": {
+                        "type": "array",
+                        "items": {"type": "number"},
+                        "description": "Filter active timesheets for specific users"
+                    },
+                    "group_ids": {
+                        "type": "array",
+                        "items": {"type": "number"},
+                        "description": "Filter active timesheets for users in specific groups"
+                    },
+                    "jobcode_ids": {
+                        "type": "array",
+                        "items": {"type": "number"},
+                        "description": "Filter active timesheets for specific jobcodes"
+                    },
+                    "supplemental_data": {
+                        "type": "string",
+                        "enum": ["yes", "no"],
+                        "default": "yes",
+                        "description": "Include supplemental data (users, jobcodes) in response"
+                    }
+                }
             }
         },
         {
             "name": "get_users",
-            "description": "Get users from QuickBooks Time.",
+            "description": "Get users from QuickBooks Time with advanced filtering options.",
             "inputSchema": {
                 "type": "object",
                 "properties": {
-                    "modified_before": {"type": "string"},
-                    "modified_since": {"type": "string"},
-                    "page": {"type": "number"},
-                    "limit": {"type": "number"}
+                    "ids": {
+                        "type": "array",
+                        "items": {"type": "number"},
+                        "description": "Filter by specific user IDs"
+                    },
+                    "not_ids": {
+                        "type": "array",
+                        "items": {"type": "number"},
+                        "description": "Exclude specific user IDs"
+                    },
+                    "employee_numbers": {
+                        "type": "array",
+                        "items": {"type": "number"},
+                        "description": "Filter by employee numbers"
+                    },
+                    "usernames": {
+                        "type": "array",
+                        "items": {"type": "string"},
+                        "description": "Filter by specific usernames"
+                    },
+                    "group_ids": {
+                        "type": "array",
+                        "items": {"type": "number"},
+                        "description": "Filter users by their group membership"
+                    },
+                    "not_group_ids": {
+                        "type": "array",
+                        "items": {"type": "number"},
+                        "description": "Exclude users from specific groups"
+                    },
+                    "payroll_ids": {
+                        "type": "array",
+                        "items": {"type": "string"},
+                        "description": "Filter by payroll identification numbers"
+                    },
+                    "active": {
+                        "type": "string",
+                        "enum": ["yes", "no", "both"],
+                        "default": "yes",
+                        "description": "Filter by user status"
+                    },
+                    "first_name": {
+                        "type": "string",
+                        "description": "Filter by first name"
+                    },
+                    "last_name": {
+                        "type": "string",
+                        "description": "Filter by last name"
+                    },
+                    "modified_before": {
+                        "type": "string",
+                        "description": "Only users modified before this date/time (ISO 8601 format)"
+                    },
+                    "modified_since": {
+                        "type": "string",
+                        "description": "Only users modified since this date/time (ISO 8601 format)"
+                    },
+                    "page": {
+                        "type": "number",
+                        "description": "Page number for pagination"
+                    },
+                    "per_page": {
+                        "type": "number",
+                        "description": "Number of results per page (max 200)"
+                    }
                 }
             }
         },
         {
             "name": "get_user",
-            "description": "Get a specific user by ID.",
+            "description": "Get user details from QuickBooks Time with advanced filtering options.",
             "inputSchema": {
                 "type": "object",
                 "properties": {
-                    "id": {"type": "number", "description": "The ID of the user to retrieve"}
-                },
-                "required": ["id"]
+                    "ids": {
+                        "type": "array",
+                        "items": {"type": "number"},
+                        "description": "Filter by specific user IDs"
+                    },
+                    "active": {
+                        "type": "string",
+                        "enum": ["yes", "no"],
+                        "description": "Filter by active or inactive users"
+                    },
+                    "first_name": {
+                        "type": "string",
+                        "description": "Filter by first name"
+                    },
+                    "last_name": {
+                        "type": "string",
+                        "description": "Filter by last name"
+                    },
+                    "modified_before": {
+                        "type": "string",
+                        "description": "Only users modified before this date/time (ISO 8601 format)"
+                    },
+                    "modified_since": {
+                        "type": "string",
+                        "description": "Only users modified since this date/time (ISO 8601 format)"
+                    },
+                    "page": {
+                        "type": "number",
+                        "description": "Page number to return"
+                    },
+                    "per_page": {
+                        "type": "number",
+                        "description": "Number of results per page"
+                    },
+                    "payroll_ids": {
+                        "type": "array",
+                        "items": {"type": "string"},
+                        "description": "Filter by payroll IDs"
+                    }
+                }
             }
         },
         {
             "name": "get_current_user",
-            "description": "Get details about the currently authenticated user.",
+            "description": "Get detailed information about the currently authenticated user, including permissions, PTO balances, and custom field values.",
             "inputSchema": {
                 "type": "object",
-                "properties": {}
+                "properties": {},
+                "additionalProperties": False
             }
         },
         {
             "name": "get_groups",
-            "description": "Get groups from QuickBooks Time.",
+            "description": "Get information about groups in your company, used for organizing users and managing permissions at a group level.",
             "inputSchema": {
                 "type": "object",
                 "properties": {
-                    "page": {"type": "number"},
-                    "limit": {"type": "number"}
+                    "ids": {
+                        "type": "array",
+                        "items": {"type": "number"},
+                        "description": "Filter results to specific group IDs"
+                    },
+                    "active": {
+                        "type": "string",
+                        "enum": ["yes", "no", "both"],
+                        "default": "yes",
+                        "description": "Filter by active status"
+                    },
+                    "manager_ids": {
+                        "type": "array",
+                        "items": {"type": "number"},
+                        "description": "Filter groups by manager user IDs"
+                    },
+                    "supplemental_data": {
+                        "type": "string",
+                        "enum": ["yes", "no"],
+                        "default": "yes",
+                        "description": "Include supplemental data (manager details) in response"
+                    }
                 }
             }
         },
         {
             "name": "get_custom_fields",
-            "description": "Get custom tracking fields configured on timecards.",
+            "description": "Get custom fields configured in your company for tracking additional information on timesheets and other objects.",
             "inputSchema": {
                 "type": "object",
                 "properties": {
-                    "page": {"type": "number"},
-                    "limit": {"type": "number"}
+                    "ids": {
+                        "type": "array",
+                        "items": {"type": "number"},
+                        "description": "Filter results to specific custom field IDs"
+                    },
+                    "active": {
+                        "type": "string",
+                        "enum": ["yes", "no", "both"],
+                        "default": "yes",
+                        "description": "Filter by active status"
+                    },
+                    "applies_to": {
+                        "type": "string",
+                        "enum": ["timesheet", "user", "jobcode"],
+                        "description": "Filter by applicable object type"
+                    },
+                    "value_type": {
+                        "type": "string",
+                        "enum": ["managed-list", "free-form"],
+                        "description": "Filter by field value type"
+                    }
                 }
             }
         },
@@ -205,12 +385,29 @@ SERVER_INFO = {
         },
         {
             "name": "get_current_totals",
-            "description": "Get current totals snapshot including shift and day totals.",
+            "description": "Get real-time totals for currently active time entries, with filtering options.",
             "inputSchema": {
                 "type": "object",
                 "properties": {
-                    "page": {"type": "number"},
-                    "limit": {"type": "number"}
+                    "user_ids": {
+                        "type": "array",
+                        "items": {"type": "number"},
+                        "description": "Filter totals to specific users"
+                    },
+                    "group_ids": {
+                        "type": "array",
+                        "items": {"type": "number"},
+                        "description": "Filter totals for users in specific groups"
+                    },
+                    "jobcode_ids": {
+                        "type": "array",
+                        "items": {"type": "number"},
+                        "description": "Filter totals for specific jobcodes"
+                    },
+                    "customfield_query": {
+                        "type": "string",
+                        "description": "Filter by custom field values. Format: <customfield_id>|<op>|<value>"
+                    }
                 }
             }
         },
@@ -244,42 +441,47 @@ SERVER_INFO = {
         },
         {
             "name": "get_project_report",
-            "description": "Get detailed project report with time entries.",
+            "description": "Get detailed project report with time tracking data and advanced filtering options.",
             "inputSchema": {
                 "type": "object",
-                "required": ["start_date", "end_date", "jobcode_ids"],
+                "required": ["start_date", "end_date"],
                 "properties": {
                     "start_date": {
                         "type": "string",
-                        "description": "Start date in YYYY-MM-DD format"
+                        "description": "Start date in YYYY-MM-DD format. Any time entries on or after this date will be included."
                     },
                     "end_date": {
                         "type": "string",
-                        "description": "End date in YYYY-MM-DD format"
+                        "description": "End date in YYYY-MM-DD format. Any time entries on or before this date will be included."
                     },
                     "user_ids": {
                         "type": "array",
                         "items": {"type": "number"},
-                        "description": "Filter by specific user IDs"
+                        "description": "Filter time entries by specific users"
                     },
                     "group_ids": {
                         "type": "array",
                         "items": {"type": "number"},
-                        "description": "Filter by specific group IDs"
+                        "description": "Filter time entries by specific groups"
                     },
                     "jobcode_ids": {
                         "type": "array",
                         "items": {"type": "number"},
-                        "description": "Filter by specific jobcode IDs (required)"
+                        "description": "Filter time entries by specific jobcodes"
                     },
                     "jobcode_type": {
                         "type": "string",
                         "enum": ["regular", "pto", "unpaid_break", "paid_break", "all"],
-                        "description": "Filter by jobcode type"
+                        "default": "all",
+                        "description": "Filter by type of jobcodes"
                     },
                     "customfielditems": {
                         "type": "object",
-                        "description": "Filter by custom field items"
+                        "additionalProperties": {
+                            "type": "array",
+                            "items": {"type": "string"}
+                        },
+                        "description": "Filter by custom field values. Format: { 'customfield_id': ['value1', 'value2'] }"
                     }
                 }
             }
