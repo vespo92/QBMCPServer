@@ -1,0 +1,173 @@
+{
+  "common_queries": {
+    "payroll": {
+      "bi_weekly": {
+        "description": "Standard bi-weekly payroll",
+        "example_query": "Run payroll for the last two weeks",
+        "api_call": "prepare_biweekly_payroll",
+        "parameters": {
+          "end_date": "2024-01-15"
+        }
+      },
+      "monthly": {
+        "description": "Monthly payroll summary",
+        "example_query": "Show me December payroll",
+        "api_call": "get_payroll",
+        "parameters": {
+          "start_date": "2024-12-01",
+          "end_date": "2024-12-31"
+        }
+      },
+      "overtime_analysis": {
+        "description": "Overtime hours analysis",
+        "example_query": "Who had overtime last month?",
+        "api_call": "get_payroll",
+        "parameters": {
+          "start_date": "2024-12-01",
+          "end_date": "2024-12-31"
+        },
+        "focus_on": "total_ot_seconds"
+      }
+    },
+    "invoicing": {
+      "client_hours": {
+        "description": "Hours for client billing",
+        "example_query": "How many hours on ABC Company project?",
+        "api_call": "get_project_report",
+        "parameters": {
+          "start_date": "2024-12-01",
+          "end_date": "2024-12-31",
+          "jobcode_ids": ["Note: Look up jobcode ID for ABC Company"]
+        }
+      },
+      "billable_summary": {
+        "description": "Billable hours by employee",
+        "example_query": "Show billable hours by employee for Project X",
+        "api_call": "get_payroll_by_jobcode",
+        "parameters": {
+          "start_date": "2024-12-01",
+          "end_date": "2024-12-31",
+          "jobcode_type": "regular"
+        }
+      }
+    },
+    "time_tracking": {
+      "whos_working": {
+        "description": "Currently clocked in employees",
+        "example_query": "Who's working right now?",
+        "api_call": "get_current_timesheets",
+        "parameters": {}
+      },
+      "daily_summary": {
+        "description": "Today's time entries",
+        "example_query": "Show me today's time entries",
+        "api_call": "get_timesheets",
+        "parameters": {
+          "start_date": "2024-01-15",
+          "end_date": "2024-01-15"
+        }
+      },
+      "missing_timesheets": {
+        "description": "Employees who haven't submitted time",
+        "example_query": "Who hasn't submitted their timesheet?",
+        "api_call": "get_users",
+        "parameters": {
+          "active": "yes"
+        },
+        "follow_up_with": "get_timesheets for each user"
+      }
+    },
+    "pto_management": {
+      "employee_pto": {
+        "description": "PTO usage for an employee",
+        "example_query": "How much vacation has John used?",
+        "api_call": "get_timesheets",
+        "parameters": {
+          "user_ids": ["Note: Look up John's user ID"],
+          "jobcode_type": "pto",
+          "start_date": "2024-01-01",
+          "end_date": "2024-12-31"
+        }
+      },
+      "upcoming_pto": {
+        "description": "Scheduled time off",
+        "example_query": "Who's taking time off next week?",
+        "api_call": "get_timesheets",
+        "parameters": {
+          "jobcode_type": "pto",
+          "start_date": "2024-01-22",
+          "end_date": "2024-01-28"
+        }
+      }
+    },
+    "reporting": {
+      "department_summary": {
+        "description": "Hours by department",
+        "example_query": "Show hours by department for last month",
+        "api_call": "get_payroll",
+        "parameters": {
+          "start_date": "2024-12-01",
+          "end_date": "2024-12-31"
+        },
+        "group_by": "group_ids"
+      },
+      "project_cost": {
+        "description": "Project labor costs",
+        "example_query": "What's the labor cost for Project ABC?",
+        "api_call": "analyze_project_profitability",
+        "parameters": {
+          "project_name": "Project ABC",
+          "start_date": "2024-10-01",
+          "end_date": "2024-12-31"
+        }
+      },
+      "quarterly_taxes": {
+        "description": "Quarterly tax preparation",
+        "example_query": "Prepare Q4 tax data",
+        "api_call": "quarterly_tax_prep",
+        "parameters": {
+          "quarter": 4,
+          "year": 2024
+        }
+      }
+    }
+  },
+  "date_examples": {
+    "natural_language": [
+      "last week",
+      "this month", 
+      "last month",
+      "yesterday",
+      "last quarter",
+      "year to date",
+      "December 2024",
+      "12/31/2024"
+    ],
+    "converted_to": "All automatically converted to YYYY-MM-DD format"
+  },
+  "terminology_mappings": {
+    "accounting_term": "api_term",
+    "employee": "user",
+    "department": "group",
+    "project": "jobcode",
+    "client": "jobcode",
+    "vacation": "pto",
+    "sick time": "pto",
+    "regular hours": "regular",
+    "time card": "timesheet",
+    "punch card": "timesheet"
+  },
+  "common_calculations": {
+    "hours_from_seconds": "seconds ÷ 3600 = hours",
+    "overtime_cost": "(ot_seconds ÷ 3600) × hourly_rate × 1.5",
+    "total_labor_cost": "regular_cost + overtime_cost + doubletime_cost",
+    "utilization_rate": "(billable_hours ÷ total_hours) × 100"
+  },
+  "best_practices": {
+    "date_ranges": "Always verify date ranges span the correct period",
+    "employee_names": "Use employee IDs when possible for accuracy",
+    "batch_operations": "Process multiple employees/projects in one call",
+    "error_handling": "Check for 'no data' responses before calculations",
+    "time_zones": "QuickBooks Time uses company timezone settings"
+  }
+}
